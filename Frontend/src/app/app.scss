@@ -1,0 +1,31 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+  background: transparent;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  opacity: 0.95;
+}
+
+.app-main {
+  padding: 1rem;
+}
