@@ -1,16 +1,17 @@
 ﻿using System.Collections.Concurrent;
-using ToDoListApi.Domain;
+using ToDoListApi.Domain.Interfaces;
+using ToDoListApi.Domain.Models;
 
-namespace ToDoListApi.Repository
+namespace ToDoListApi.Infrastructure
 {
     public class InMemoryTodoRepository : IToDoListRepository
     {
-        private readonly ConcurrentDictionary<Guid, Todo> _store = new();
+        private readonly ConcurrentDictionary<Guid, ToDoItem> _store = new();
 
-        public IEnumerable<Todo> GetAll() =>
+        public IEnumerable<ToDoItem> GetAll() =>
             _store.Values.OrderBy(t => t.CreatedAt);
 
-        public Todo Add(Todo todo)
+        public ToDoItem Add(ToDoItem todo)
         {
             todo.Id = Guid.NewGuid();
             todo.CreatedAt = DateTime.UtcNow;
@@ -20,7 +21,7 @@ namespace ToDoListApi.Repository
 
         public bool Delete(Guid id) => _store.TryRemove(id, out _);
 
-        public bool Update(Todo todo)
+        public bool Update(ToDoItem todo)
         {
             if (!_store.ContainsKey(todo.Id)) return false;
             _store[todo.Id] = todo;

@@ -1,5 +1,6 @@
-using ToDoListApi.Domain;
-using ToDoListApi.Repository;
+using ToDoListApi.Domain.Interfaces;
+using ToDoListApi.Domain.Services;
+using ToDoListApi.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

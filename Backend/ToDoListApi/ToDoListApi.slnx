@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="ToDoListApi.Domain/ToDoListApi.Domain.csproj" />
-  <Project Path="ToDoListApi.Repository/ToDoListApi.Repository.csproj" />
+  <Project Path="ToDoListApi.Repository/ToDoListApi.Infrastructure.csproj" />
   <Project Path="ToDoListApi/ToDoListApi.csproj" />
 </Solution>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using ToDoListApi.Domain;
+using ToDoListApi.Domain.Interfaces;
+using ToDoListApi.Domain.Models;
 
 namespace ToDoListApi.Controllers
 {
@@ -22,7 +23,7 @@ namespace ToDoListApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Todo todo)
+        public IActionResult Create([FromBody] ToDoItem todo)
         {
             try
             {
@@ -36,7 +37,7 @@ namespace ToDoListApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id, [FromBody] Todo todo)
+        public IActionResult Update(Guid id, [FromBody] ToDoItem todo)
         {
             todo.Id = id;
             var updated = _service.Update(todo);

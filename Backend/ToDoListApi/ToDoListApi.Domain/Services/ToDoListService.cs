@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ToDoListApi.Domain.Interfaces;
+using ToDoListApi.Domain.Models;
 
-namespace ToDoListApi.Domain
+namespace ToDoListApi.Domain.Services
 {
 
     public class ToDoListService : IToDoListService
@@ -14,18 +16,18 @@ namespace ToDoListApi.Domain
             _repository = repository;
         }
 
-        public IEnumerable<Todo> GetAll() => _repository.GetAll();
+        public IEnumerable<ToDoItem> GetAll() => _repository.GetAll();
 
-        public Todo Add(string title)
+        public ToDoItem Add(string title)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentException("Title is required");
 
-            var todo = new Todo { Title = title };
+            var todo = new ToDoItem { Title = title };
             return _repository.Add(todo);
         }
 
-        public bool Update(Todo todo) => _repository.Update(todo);
+        public bool Update(ToDoItem todo) => _repository.Update(todo);
 
         public bool Delete(Guid id) => _repository.Delete(id);
     }

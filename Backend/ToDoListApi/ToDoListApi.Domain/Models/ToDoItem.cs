@@ -1,6 +1,6 @@
-﻿namespace ToDoListApi.Domain
+﻿namespace ToDoListApi.Domain.Models
 {
-    public class Todo
+    public class ToDoItem
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Title { get; set; } = string.Empty;
