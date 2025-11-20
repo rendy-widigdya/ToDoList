@@ -7,10 +7,24 @@
   background: var(--card-bg);
   color: var(--text);
 
+  h2 {
+    text-align: center;
+  }
+
   .add {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 3rem;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    input {
+      font-size: 1rem;
+      padding: 0.5rem;
+      border: 1px solid var(--text);
+      border-radius: 4px;
+    }
   }
 
   ul {
@@ -23,7 +37,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.25rem 0;
+    padding: 0.5rem;
+    border-radius: 10px;
+    border: solid 1px var(--text);
+    margin-bottom: 5px;
   }
 
   .created {
@@ -58,11 +75,19 @@
     &:hover {
       background: var(--card-border);
     }
+
+    input {
+      font-size: 1rem;
+      padding: 0.25rem;
+      border: 1px solid var(--text);
+      border-radius: 4px;
+    }
   }
 
   .btn {
+    min-width: 80px;
     font-size: 0.85rem;
-    padding: 0.35rem 0.6rem;
+    padding: 0.5rem 0.6rem;
     border-radius: 6px;
     border: 1px solid transparent;
     cursor: pointer;
@@ -83,6 +108,7 @@
       background: var(--add);
       color: var(--text);
       border-color: transparent;
+      padding: 0.5rem 0.6rem;
 
       &:hover {
         background: var(--add-contrast);
