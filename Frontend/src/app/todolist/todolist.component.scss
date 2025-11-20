@@ -6,36 +6,61 @@
   border-radius: 6px;
   background: var(--card-bg);
   color: var(--text);
+
+  .add {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+  }
+
+  .created {
+    margin-left: 0.75rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .done {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .item-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .item-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .todo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    &:hover {
+      background: var(--card-border);
+    }
+  }
 }
 
-.todolist .add {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.25rem 0;
-  align-items: center;
-}
-
-.todolist .created {
-  margin-left: 0.75rem;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.done {
-  text-decoration: line-through;
-  color: var(--muted);
-}
-
-/* Buttons */
 .btn {
   font-size: 0.85rem;
   padding: 0.35rem 0.6rem;
@@ -60,9 +85,10 @@ li {
   background: var(--add);
   color: var(--text);
   border-color: transparent;
-}
-.btn-add:hover {
-  background: var(--add-contrast);
+
+  &:hover {
+    background: var(--add-contrast);
+  }
 }
 
 .btn-edit {
@@ -70,18 +96,19 @@ li {
   border: 1px solid var(--card-border);
   color: var(--text);
   margin-right: 0.5rem;
-}
-.btn-edit:hover {
-  background: var(--edit-contrast);
+
+  &:hover {
+    background: var(--edit-contrast);
+  }
 }
 
 .btn-delete {
   background: var(--delete);
   color: var(--text);
-  border: 1px solid rgba(239, 68, 68, 0.12);
-}
-.btn-delete:hover {
-  background: var(--delete-contrast);
+
+  &:hover {
+    background: var(--delete-contrast);
+  }
 }
 
 .btn-save {
@@ -94,24 +121,4 @@ li {
 .btn-cancel {
   background: transparent;
   border: 1px solid var(--card-border);
-}
-
-.item-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-.item-left {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.todo-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  &:hover {
-    background: var(--card-border);
-  }
 }

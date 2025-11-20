@@ -24,15 +24,21 @@ export class TodoListComponent implements OnInit {
   }
 
   load(): void {
-    this.svc.getAll().subscribe((t) => (this.todos = t || []));
+    this.svc.getAll().subscribe({
+      next: (t) => (this.todos = t || []),
+      error: (err) => console.error('Failed to load todos', err),
+    });
   }
 
   add(): void {
     const title = this.newTitle?.trim();
     if (!title) return;
-    this.svc.create(title).subscribe((created) => {
-      this.todos.push(created);
-      this.newTitle = '';
+    this.svc.create(title).subscribe({
+      next: (created) => {
+        this.todos.push(created);
+        this.newTitle = '';
+      },
+      error: (err) => console.error('Failed to create todo', err),
     });
   }
 
@@ -44,11 +50,14 @@ export class TodoListComponent implements OnInit {
   saveEdit(todo: Todo): void {
     if (!this.editingId) return;
     const updated: Todo = { ...todo, title: this.editTitle };
-    this.svc.update(this.editingId, updated).subscribe(() => {
-      const idx = this.todos.findIndex((t) => t.id === this.editingId);
-      if (idx >= 0) this.todos[idx] = updated;
-      this.editingId = null;
-      this.editTitle = '';
+    this.svc.update(this.editingId, updated).subscribe({
+      next: () => {
+        const idx = this.todos.findIndex((t) => t.id === this.editingId);
+        if (idx >= 0) this.todos[idx] = updated;
+        this.editingId = null;
+        this.editTitle = '';
+      },
+      error: (err) => console.error('Failed to save todo', err),
     });
   }
 
@@ -59,16 +68,22 @@ export class TodoListComponent implements OnInit {
 
   toggleDone(todo: Todo): void {
     const updated: Todo = { ...todo, isDone: !todo.isDone };
-    this.svc.update(todo.id, updated).subscribe(() => {
-      const idx = this.todos.findIndex((t) => t.id === todo.id);
-      if (idx >= 0) this.todos[idx] = updated;
+    this.svc.update(todo.id, updated).subscribe({
+      next: () => {
+        const idx = this.todos.findIndex((t) => t.id === todo.id);
+        if (idx >= 0) this.todos[idx] = updated;
+      },
+      error: (err) => console.error('Failed to toggle todo', err),
     });
   }
 
   delete(todo: Todo): void {
     if (!todo.id) return;
-    this.svc.delete(todo.id).subscribe(() => {
-      this.todos = this.todos.filter((t) => t.id !== todo.id);
+    this.svc.delete(todo.id).subscribe({
+      next: () => {
+        this.todos = this.todos.filter((t) => t.id !== todo.id);
+      },
+      error: (err) => console.error('Failed to delete todo', err),
     });
   }
 }
