@@ -14,7 +14,7 @@ This project consists of two main components:
 Before running this project, ensure you have the following installed:
 
 - **.NET SDK 10.0** or later — [Download](https://dotnet.microsoft.com/download)
-- **Node.js 18+** (includes npm) — [Download](https://nodejs.org/)
+- **Node.js 20** (includes npm) — [Download](https://nodejs.org/)
 - A code editor (Visual Studio Code, Visual Studio 2022, etc.)
 
 ## Project Structure
@@ -48,8 +48,8 @@ dotnet run
 
 The API will be available at:
 
-- **HTTP**: `http://localhost:5000`
-- **HTTPS**: `https://localhost:5001`
+- **HTTP**: `http://localhost:5168`
+- **HTTPS**: `https://localhost:7006`
 
 ### Step 2: Start the Frontend (in a new terminal)
 
@@ -65,7 +65,7 @@ The Angular app will open at `http://localhost:4200` in your browser.
 
 ## How They Communicate
 
-- The **Frontend** calls the **Backend API** at `http://localhost:5000` (or `https://localhost:5001`)
+- The **Frontend** calls the **Backend API** at `http://localhost:5168` (or `https://localhost:7006`)
 - API endpoints the Frontend uses:
   - `GET /api/todolist` — Get all todos
   - `GET /api/todolist/{id}` — Get a specific todo
@@ -181,10 +181,10 @@ Tests include:
 ### "Cannot connect to backend"
 
 - Ensure the backend is running (`dotnet run` in `Backend/ToDoListApi/`)
-- Check that the API is accessible at `http://localhost:5000`
+- Check that the API is accessible at `http://localhost:5168`
 - Verify the frontend's `apiBaseUrl` in `src/environments/environment.ts`
 
-### "Port 5000 is already in use"
+### "Port 5168 is already in use"
 
 - Change the port in `Backend/ToDoListApi/Properties/launchSettings.json`
 - Update the frontend's `apiBaseUrl` to match the new port
@@ -228,7 +228,7 @@ Tests include:
 ### Frontend
 
 - Angular 20
-- TypeScript 5.9
+- TypeScript 5.9.2
 - RxJS for reactive programming
 - Karma and Jasmine for testing
 - CSS with CSS variables for theming
