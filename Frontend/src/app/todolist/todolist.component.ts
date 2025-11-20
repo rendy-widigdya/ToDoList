@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { catchError, of } from 'rxjs';
 import { TodoListService } from './todolist.service';
 import { Todo } from './todo.model';
 
@@ -12,44 +14,103 @@ import { Todo } from './todo.model';
   styleUrls: ['./todolist.component.scss'],
 })
 export class TodoListComponent implements OnInit {
-  todos: Todo[] = [];
+  todos = signal<Todo[]>([]);
   newTitle = '';
   editingId: string | null = null;
   editTitle = '';
+  isLoading = signal(false);
+  error = signal<string | null>(null);
 
-  constructor(private svc: TodoListService) {}
+  constructor(
+    private readonly todoService: TodoListService,
+    private readonly destroyRef: DestroyRef,
+  ) {}
 
   ngOnInit(): void {
     this.load();
   }
 
   load(): void {
-    this.svc.getAll().subscribe((t) => (this.todos = t || []));
+    this.isLoading.set(true);
+    this.error.set(null);
+    this.todoService
+      .getAll()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err) => {
+          this.error.set('Failed to load todos. Please try again.');
+          console.error('Error loading todos:', err);
+          return of([]);
+        }),
+      )
+      .subscribe((todos) => {
+        this.todos.set(todos || []);
+        this.isLoading.set(false);
+      });
   }
 
   add(): void {
     const title = this.newTitle?.trim();
     if (!title) return;
-    this.svc.create(title).subscribe((created) => {
-      this.todos.push(created);
-      this.newTitle = '';
-    });
+
+    this.isLoading.set(true);
+    this.error.set(null);
+    this.todoService
+      .create(title)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err) => {
+          this.error.set('Failed to create todo. Please try again.');
+          console.error('Error creating todo:', err);
+          return of(null);
+        }),
+      )
+      .subscribe((created) => {
+        if (created) {
+          this.todos.update((todos) => [...todos, created]);
+          this.newTitle = '';
+        }
+        this.isLoading.set(false);
+      });
   }
 
   startEdit(todo: Todo): void {
-    this.editingId = todo.id ?? null;
+    this.editingId = todo.id;
     this.editTitle = todo.title;
   }
 
   saveEdit(todo: Todo): void {
     if (!this.editingId) return;
-    const updated: Todo = { ...todo, title: this.editTitle };
-    this.svc.update(this.editingId, updated).subscribe(() => {
-      const idx = this.todos.findIndex((t) => t.id === this.editingId);
-      if (idx >= 0) this.todos[idx] = updated;
-      this.editingId = null;
-      this.editTitle = '';
-    });
+
+    const title = this.editTitle.trim();
+    if (!title) {
+      this.cancelEdit();
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.error.set(null);
+    const updated: Todo = { ...todo, title };
+    this.todoService
+      .update(this.editingId, updated)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err) => {
+          this.error.set('Failed to update todo. Please try again.');
+          console.error('Error updating todo:', err);
+          return of(null);
+        }),
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.todos.update((todos) =>
+            todos.map((t) => (t.id === this.editingId ? updated : t)),
+          );
+          this.editingId = null;
+          this.editTitle = '';
+        }
+        this.isLoading.set(false);
+      });
   }
 
   cancelEdit(): void {
@@ -59,16 +120,49 @@ export class TodoListComponent implements OnInit {
 
   toggleDone(todo: Todo): void {
     const updated: Todo = { ...todo, isDone: !todo.isDone };
-    this.svc.update(todo.id, updated).subscribe(() => {
-      const idx = this.todos.findIndex((t) => t.id === todo.id);
-      if (idx >= 0) this.todos[idx] = updated;
-    });
+    this.todoService
+      .update(todo.id, updated)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err) => {
+          this.error.set('Failed to update todo. Please try again.');
+          console.error('Error updating todo:', err);
+          return of(null);
+        }),
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.todos.update((todos) =>
+            todos.map((t) => (t.id === todo.id ? updated : t)),
+          );
+        }
+      });
   }
 
   delete(todo: Todo): void {
     if (!todo.id) return;
-    this.svc.delete(todo.id).subscribe(() => {
-      this.todos = this.todos.filter((t) => t.id !== todo.id);
-    });
+
+    this.isLoading.set(true);
+    this.error.set(null);
+    this.todoService
+      .delete(todo.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err) => {
+          this.error.set('Failed to delete todo. Please try again.');
+          console.error('Error deleting todo:', err);
+          return of(null);
+        }),
+      )
+      .subscribe((result) => {
+        if (result !== null) {
+          this.todos.update((todos) => todos.filter((t) => t.id !== todo.id));
+        }
+        this.isLoading.set(false);
+      });
+  }
+
+  trackByTodoId(_index: number, todo: Todo): string {
+    return todo.id;
   }
 }

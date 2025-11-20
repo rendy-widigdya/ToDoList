@@ -1,31 +1,104 @@
 <div class="todolist">
   <h2>To Do List</h2>
 
-  <div class="add">
-    <input [(ngModel)]="newTitle" placeholder="New To Do Item" />
-    <button class="btn btn-add" (click)="add()">Add</button>
+  <div *ngIf="error()" class="error-message" role="alert">
+    {{ error() }}
+    <button type="button" class="btn-close" (click)="error.set(null)" aria-label="Close error">
+      ×
+    </button>
   </div>
 
-  <ul>
-    <li *ngFor="let todo of todos">
-      <div *ngIf="editingId !== todo.id" class="todo-row">
-        <label class="item-left">
-          <input type="checkbox" [checked]="todo.isDone" (change)="toggleDone(todo)" />
-          <span [class.done]="todo.isDone">{{ todo.title }}</span>
-        </label>
-        <small class="created">{{ todo.createdAt | date : 'short' }}</small>
-        <div class="item-actions">
-          <button class="btn btn-edit" (click)="startEdit(todo)">Edit</button>
-          <button class="btn btn-delete" (click)="delete(todo)">Delete</button>
-        </div>
-      </div>
-      <div *ngIf="editingId === todo.id" class="todo-row">
-        <input [(ngModel)]="editTitle" />
-        <div class="item-actions">
-          <button class="btn btn-save" (click)="saveEdit(todo)">Save</button>
-          <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
-        </div>
-      </div>
-    </li>
-  </ul>
+  <div class="add">
+    <input
+      [(ngModel)]="newTitle"
+      placeholder="New To Do Item"
+      (keyup.enter)="add()"
+      [disabled]="isLoading()"
+      aria-label="New todo item title"
+    />
+    <button
+      class="btn btn-add"
+      (click)="add()"
+      [disabled]="isLoading() || !newTitle.trim()"
+      type="button"
+    >
+      Add
+    </button>
+  </div>
+
+  @if (isLoading() && todos().length === 0) {
+    <div class="loading" aria-live="polite">Loading todos...</div>
+  } @else {
+    <ul>
+      @for (todo of todos(); track trackByTodoId($index, todo)) {
+        <li>
+          @if (editingId !== todo.id) {
+            <div class="todo-row">
+              <label class="item-left">
+                <input
+                  type="checkbox"
+                  [checked]="todo.isDone"
+                  (change)="toggleDone(todo)"
+                  [disabled]="isLoading()"
+                  [attr.aria-label]="'Mark ' + todo.title + ' as ' + (todo.isDone ? 'incomplete' : 'complete')"
+                />
+                <span [class.done]="todo.isDone">{{ todo.title }}</span>
+              </label>
+              <small class="created">{{ todo.createdAt | date : 'short' }}</small>
+              <div class="item-actions">
+                <button
+                  class="btn btn-edit"
+                  (click)="startEdit(todo)"
+                  [disabled]="isLoading()"
+                  type="button"
+                  [attr.aria-label]="'Edit ' + todo.title"
+                >
+                  Edit
+                </button>
+                <button
+                  class="btn btn-delete"
+                  (click)="delete(todo)"
+                  [disabled]="isLoading()"
+                  type="button"
+                  [attr.aria-label]="'Delete ' + todo.title"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="todo-row">
+              <input
+                [(ngModel)]="editTitle"
+                (keyup.enter)="saveEdit(todo)"
+                (keyup.escape)="cancelEdit()"
+                [disabled]="isLoading()"
+                aria-label="Edit todo title"
+              />
+              <div class="item-actions">
+                <button
+                  class="btn btn-save"
+                  (click)="saveEdit(todo)"
+                  [disabled]="isLoading() || !editTitle.trim()"
+                  type="button"
+                >
+                  Save
+                </button>
+                <button
+                  class="btn btn-cancel"
+                  (click)="cancelEdit()"
+                  [disabled]="isLoading()"
+                  type="button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          }
+        </li>
+      } @empty {
+        <li class="empty-state">No todos yet. Add one above!</li>
+      }
+    </ul>
+  }
 </div>

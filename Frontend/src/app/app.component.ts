@@ -9,11 +9,13 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class AppComponent {
   public readonly title = signal('Welcome to the To Do List App');
-  public readonly theme = signal<'light' | 'dark'>(this.getInitialTheme());
+  public readonly theme = signal<'light' | 'dark'>('light');
 
   constructor(@Inject(PLATFORM_ID) private readonly platformId: object) {
     if (isPlatformBrowser(this.platformId)) {
-      document.documentElement.setAttribute('data-theme', this.theme());
+      const initialTheme = this.getInitialTheme();
+      this.theme.set(initialTheme);
+      document.documentElement.setAttribute('data-theme', initialTheme);
     }
   }
 
