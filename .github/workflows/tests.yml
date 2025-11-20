@@ -1,0 +1,72 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    name: Backend Unit Tests (.NET)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Backend/
+
+      - name: Build
+        run: dotnet build Backend/ --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test Backend/ --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: '**/test-results.trx'
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    name: Frontend Unit Tests (Angular)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'Frontend/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: Frontend
+
+      - name: Run tests
+        run: npm test -- --watch=false --code-coverage --browsers=ChromeHeadless
+        working-directory: Frontend
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: Frontend/coverage/
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: Frontend/karma-results.json
