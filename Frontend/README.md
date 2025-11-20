@@ -1,59 +1,62 @@
-# Frontend
+# ToDoList — Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.10.
+This is the frontend for the ToDoList example app (Angular 20).
 
-## Development server
+**Quick Start**
 
-To start a local development server, run:
+- **Install deps:**
 
-```bash
-ng serve
+```powershell
+cd C:\Workspace\ToDoList\Frontend
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Run the dev server:**
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```powershell
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open http://localhost:4200 in your browser. The app uses a backend API at `http://localhost:5168/api/todolist` by default — see Environment below.
 
-```bash
-ng generate --help
+**Environment configuration**
+
+- The API base url is stored in `src/environments/environment.ts` (and `environment.prod.ts`). Change `apiBaseUrl` there for local testing or production deployments.
+- If you use `ng build --configuration production`, Angular's file replacements (configured in `angular.json`) should replace `environment.ts` with `environment.prod.ts`.
+
+**Running tests**
+
+- Unit tests (Karma + Jasmine):
+
+```powershell
+npm test
 ```
 
-## Building
+- Added tests:
+  - `src/app/todolist/todolist.service.spec.ts` — uses `HttpClientTestingModule` to verify HTTP calls (GET/POST/PUT/DELETE).
+  - `src/app/todolist/todolist.component.spec.ts` — uses a spy `TodoListService` to test component behaviors (load, add, toggle, delete).
 
-To build the project run:
+If Karma opens a browser, test results will appear there; the command will also report failures in the terminal.
 
-```bash
-ng build
-```
+**Theme and UI notes**
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- The app includes a light/dark theme implemented with CSS variables in `src/styles.scss`. The current theme is stored in `localStorage` and applied via a `data-theme` attribute on the document root.
+- There is a theme toggle button in the app header.
 
-## Running unit tests
+**Project structure (relevant files)**
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- `src/app/todolist/` — feature module (lazy-loaded), component, service, styles and tests.
+- `src/environments/*` — environment configuration (apiBaseUrl, production flag).
 
-```bash
-ng test
-```
+**HTTP provider**
 
-## Running end-to-end tests
+- The project uses the modern `provideHttpClient()` provider (configured in `src/app/app-module.ts`) instead of the older `HttpClientModule` import.
 
-For end-to-end (e2e) testing, run:
+**Tips**
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Ensure the backend is running at the configured `apiBaseUrl` before using the UI. The backend endpoints expected are:
+  - GET /api/todolist
+  - POST /api/todolist
+  - PUT /api/todolist/{id}
+  - DELETE /api/todolist/{id}
+- To change the API endpoint without editing the source files, update `src/environments/environment.ts`.

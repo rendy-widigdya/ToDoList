@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TodoListService } from './todolist.service';
 import { Todo } from './todo.model';
 
@@ -9,8 +9,7 @@ describe('TodoListService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [TodoListService],
+      providers: [provideHttpClientTesting(), TodoListService],
     });
 
     service = TestBed.inject(TodoListService);
