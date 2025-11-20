@@ -1,0 +1,25 @@
+@ToDoListApi_HostAddress = http://localhost:5168
+
+### Get all todos
+GET {{ToDoListApi_HostAddress}}/todolist
+Accept: application/json
+
+### Create a new todo
+POST {{ToDoListApi_HostAddress}}/todolist
+Content-Type: application/json
+
+{
+  "title": "My new task"
+}
+
+### Update a todo
+PUT {{ToDoListApi_HostAddress}}/todolist/{id}
+Content-Type: application/json
+
+{
+  "title": "Updated task",
+  "isDone": true
+}
+
+### Delete a todo
+DELETE {{ToDoListApi_HostAddress}}/todolist/{id}
