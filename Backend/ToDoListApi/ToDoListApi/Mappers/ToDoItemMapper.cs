@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ToDoListApi.Domain.Models;
+﻿using ToDoListApi.Domain.Models;
 using ToDoListApi.Models;
 
 namespace ToDoListApi.Domain.Mappers
 {
-    public static class TodoItemMapper
+    public static class ToDoItemMapper
     {
         public static ToDoItem ToDomain(ToDoItemRequest request)
         {
             return new ToDoItem
             {
+                Id = Guid.NewGuid(),
                 Title = request.Title,
-                IsDone = false
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow,
             };
         }
 

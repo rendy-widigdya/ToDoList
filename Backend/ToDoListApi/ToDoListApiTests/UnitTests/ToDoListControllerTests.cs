@@ -1,16 +1,12 @@
 ﻿using Moq;
 using ToDoListApi.Domain.Interfaces;
 using ToDoListApi.Domain.Models;
-using ToDoListApi.Domain.Services;
-using ToDoListApi.Infrastructure;
-using ToDoListApi.Domain.Mappers;
 using ToDoListApi.Models;
 using ToDoListApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ToDoListApiTests.UnitTests
 {
-
     /// <summary>
     /// Unit tests for ToDoListController class.
     /// </summary>
@@ -42,8 +38,10 @@ namespace ToDoListApiTests.UnitTests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(200, result.StatusCode);
-            var returnedTodos = Assert.IsAssignableFrom<IEnumerable<ToDoItem>>(result.Value);
+            var returnedTodos = Assert.IsAssignableFrom<IEnumerable<ToDoItemResponse>>(result.Value);
             Assert.Equal(2, returnedTodos.Count());
+            Assert.Contains(returnedTodos, t => t.Title == "Task 1");
+            Assert.Contains(returnedTodos, t => t.Title == "Task 2");
         }
 
         [Fact]
@@ -57,7 +55,7 @@ namespace ToDoListApiTests.UnitTests
 
             // Assert
             Assert.NotNull(result);
-            var returnedTodos = Assert.IsAssignableFrom<IEnumerable<ToDoItem>>(result.Value);
+            var returnedTodos = Assert.IsAssignableFrom<IEnumerable<ToDoItemResponse>>(result.Value);
             Assert.Empty(returnedTodos);
         }
 
@@ -65,7 +63,7 @@ namespace ToDoListApiTests.UnitTests
         public void Create_WithValidTodo_ShouldReturnCreatedAtAction()
         {
             // Arrange
-            var request = new ToDoItem { Title = "New Task" };
+            var request = new ToDoItemRequest { Title = "New Task" };
             var createdTodo = new ToDoItem { Id = Guid.NewGuid(), Title = "New Task" };
             _serviceMock.Setup(s => s.Add("New Task")).Returns(createdTodo);
 
@@ -76,14 +74,16 @@ namespace ToDoListApiTests.UnitTests
             Assert.NotNull(result);
             Assert.Equal(201, result.StatusCode);
             Assert.Equal(nameof(ToDoListController.GetAll), result.ActionName);
-            Assert.Equal(createdTodo, result.Value);
+            var response = Assert.IsType<ToDoItemResponse>(result.Value);
+            Assert.Equal("New Task", response.Title);
+            Assert.Equal(createdTodo.Id, response.Id);
         }
 
         [Fact]
         public void Create_WithEmptyTitle_ShouldReturnBadRequest()
         {
             // Arrange
-            var request = new ToDoItem { Title = "" };
+            var request = new ToDoItemRequest { Title = "" };
             _serviceMock.Setup(s => s.Add("")).Throws<ArgumentException>();
 
             // Act
@@ -98,7 +98,7 @@ namespace ToDoListApiTests.UnitTests
         public void Create_WhenServiceThrowsException_ShouldReturnBadRequest()
         {
             // Arrange
-            var request = new ToDoItem { Title = "Test" };
+            var request = new ToDoItemRequest { Title = "Test" };
             _serviceMock.Setup(s => s.Add("Test")).Throws(new ArgumentException("Title is required"));
 
             // Act
@@ -114,11 +114,11 @@ namespace ToDoListApiTests.UnitTests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var todo = new ToDoItem { Id = id, Title = "Updated Task" };
+            var request = new ToDoItemRequest { Title = "Updated Task" };
             _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>())).Returns(true);
 
             // Act
-            var result = _controller.Update(id, todo);
+            var result = _controller.Update(id, request);
 
             // Assert
             Assert.IsType<NoContentResult>(result);
@@ -129,11 +129,11 @@ namespace ToDoListApiTests.UnitTests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var todo = new ToDoItem { Id = id, Title = "Updated Task" };
+            var request = new ToDoItemRequest { Title = "Updated Task" };
             _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>())).Returns(false);
 
             // Act
-            var result = _controller.Update(id, todo);
+            var result = _controller.Update(id, request);
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
@@ -144,14 +144,18 @@ namespace ToDoListApiTests.UnitTests
         {
             // Arrange
             var id = Guid.NewGuid();
-            var todo = new ToDoItem { Title = "Updated Task" };
-            _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>())).Returns(true);
+            var request = new ToDoItemRequest { Title = "Updated Task" };
+            ToDoItem? captured = null;
+            _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>()))
+                .Callback<ToDoItem>(t => captured = t)
+                .Returns(true);
 
             // Act
-            var result = _controller.Update(id, todo);
+            var result = _controller.Update(id, request);
 
             // Assert
-            Assert.Equal(id, todo.Id);
+            Assert.Equal(id, captured!.Id);
+            Assert.Equal("Updated Task", captured.Title);
             _serviceMock.Verify(s => s.Update(It.Is<ToDoItem>(t => t.Id == id)), Times.Once);
         }
 

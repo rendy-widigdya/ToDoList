@@ -19,7 +19,7 @@ namespace ToDoListApiTests.UnitTests
             var request = new ToDoItemRequest { Title = "Test Task" };
 
             // Act
-            var result = TodoItemMapper.ToDomain(request);
+            var result = ToDoItemMapper.ToDomain(request);
 
             // Assert
             Assert.Equal("Test Task", result.Title);
@@ -33,7 +33,7 @@ namespace ToDoListApiTests.UnitTests
             var request = new ToDoItemRequest { Title = "Test" };
 
             // Act
-            var result = TodoItemMapper.ToDomain(request);
+            var result = ToDoItemMapper.ToDomain(request);
 
             // Assert
             Assert.False(result.IsDone);
@@ -52,7 +52,7 @@ namespace ToDoListApiTests.UnitTests
             };
 
             // Act
-            var result = TodoItemMapper.ToResponse(item);
+            var result = ToDoItemMapper.ToResponse(item);
 
             // Assert
             Assert.Equal(item.Id, result.Id);
@@ -67,7 +67,7 @@ namespace ToDoListApiTests.UnitTests
             var item = new ToDoItem { Title = "Task", IsDone = true };
 
             // Act
-            var result = TodoItemMapper.ToResponse(item);
+            var result = ToDoItemMapper.ToResponse(item);
 
             // Assert
             Assert.True(result.IsCompleted);
@@ -80,7 +80,7 @@ namespace ToDoListApiTests.UnitTests
             var item = new ToDoItem { Title = "Task", IsDone = false };
 
             // Act
-            var result = TodoItemMapper.ToResponse(item);
+            var result = ToDoItemMapper.ToResponse(item);
 
             // Assert
             Assert.False(result.IsCompleted);

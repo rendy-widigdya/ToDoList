@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDoListApi.Domain.Interfaces;
-using ToDoListApi.Domain.Models;
+using ToDoListApi.Models;
+using ToDoListApi.Domain.Mappers;
 
 namespace ToDoListApi.Controllers
 {
@@ -18,17 +19,19 @@ namespace ToDoListApi.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var todos = _service.GetAll();
+            var todos = _service.GetAll()
+                .Select(ToDoItemMapper.ToResponse);
             return Ok(todos);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ToDoItem todo)
+        public IActionResult Create([FromBody] ToDoItemRequest request)
         {
             try
             {
-                var created = _service.Add(todo.Title);
-                return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
+                var created = _service.Add(request.Title);
+                var response = ToDoItemMapper.ToResponse(created);
+                return CreatedAtAction(nameof(GetAll), new { id = response.Id }, response);
             }
             catch (ArgumentException ex)
             {
@@ -37,10 +40,11 @@ namespace ToDoListApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id, [FromBody] ToDoItem todo)
+        public IActionResult Update(Guid id, [FromBody] ToDoItemRequest request)
         {
-            todo.Id = id;
-            var updated = _service.Update(todo);
+            var domainItem = ToDoItemMapper.ToDomain(request);
+            domainItem.Id = id;
+            var updated = _service.Update(domainItem);
             return updated ? NoContent() : NotFound();
         }
 

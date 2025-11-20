@@ -2,6 +2,6 @@
 {
     public class ToDoItemRequest
     {
-        public string Title { get; set; }
+        public required string Title { get; set; }
     }
 }
