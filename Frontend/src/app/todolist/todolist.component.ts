@@ -48,14 +48,17 @@ export class TodoListComponent implements OnInit {
   }
 
   saveEdit(todo: Todo): void {
-    if (!this.editingId) return;
-    const updated: Todo = { ...todo, title: this.editTitle };
+    const title = this.editTitle?.trim();
+    if (!this.editingId || !title) return;
+
+    const updated: Todo = { ...todo, title };
     this.svc.update(this.editingId, updated).subscribe({
       next: () => {
         const idx = this.todos.findIndex((t) => t.id === this.editingId);
-        if (idx >= 0) this.todos[idx] = updated;
-        this.editingId = null;
-        this.editTitle = '';
+        if (idx >= 0) {
+          this.todos[idx] = updated;
+        }
+        this.cancelEdit();
       },
       error: (err) => console.error('Failed to save todo', err),
     });
@@ -67,11 +70,15 @@ export class TodoListComponent implements OnInit {
   }
 
   toggleDone(todo: Todo): void {
+    if (!todo.id) return;
+
     const updated: Todo = { ...todo, isDone: !todo.isDone };
     this.svc.update(todo.id, updated).subscribe({
       next: () => {
         const idx = this.todos.findIndex((t) => t.id === todo.id);
-        if (idx >= 0) this.todos[idx] = updated;
+        if (idx >= 0) {
+          this.todos[idx] = updated;
+        }
       },
       error: (err) => console.error('Failed to toggle todo', err),
     });

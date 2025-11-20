@@ -18,11 +18,11 @@ export class TodoListService {
     return this.http.post<Todo>(this.base, { title });
   }
 
-  update(id: string, todo: Todo): Observable<any> {
-    return this.http.put(`${this.base}/${id}`, todo);
+  update(id: string, todo: Todo): Observable<void> {
+    return this.http.put<void>(`${this.base}/${id}`, todo);
   }
 
-  delete(id: string): Observable<any> {
-    return this.http.delete(`${this.base}/${id}`);
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
   }
 }

@@ -55,7 +55,7 @@ describe('TodoListComponent', () => {
   it('toggles done', () => {
     const t: Todo = { id: '9', title: 'x', isDone: false, createdAt: new Date().toISOString() };
     svcSpy.getAll.and.returnValue(of([t]));
-    svcSpy.update.and.returnValue(of({}));
+    svcSpy.update.and.returnValue(of());
 
     fixture.detectChanges();
     component.toggleDone(t);
@@ -66,7 +66,7 @@ describe('TodoListComponent', () => {
   it('deletes a todo', () => {
     const t: Todo = { id: '10', title: 'rm', isDone: false, createdAt: new Date().toISOString() };
     svcSpy.getAll.and.returnValue(of([t]));
-    svcSpy.delete.and.returnValue(of({}));
+    svcSpy.delete.and.returnValue(of());
 
     fixture.detectChanges();
     component.delete(t);

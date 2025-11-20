@@ -8,30 +8,38 @@ import { Component, signal } from '@angular/core';
 })
 export class App {
   public readonly title = signal('Welcome to the To Do List App');
-  public readonly theme = signal<'light' | 'dark'>(
-    (localStorage.getItem('theme') as 'light' | 'dark') ||
-      (typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light')
-  );
+  public readonly theme = signal<'light' | 'dark'>(this.getInitialTheme());
 
   constructor() {
-    // apply initial theme
+    this.applyTheme(this.theme());
+  }
+
+  private getInitialTheme(): 'light' | 'dark' {
+    if (typeof window === 'undefined') return 'light';
+
+    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (stored === 'light' || stored === 'dark') return stored;
+
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  private applyTheme(theme: 'light' | 'dark'): void {
     try {
-      document.documentElement.setAttribute('data-theme', this.theme());
-    } catch {}
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch {
+      // Ignore errors in SSR or test environments
+    }
   }
 
   public toggleTheme(): void {
     const next = this.theme() === 'dark' ? 'light' : 'dark';
     this.theme.set(next);
-    try {
-      document.documentElement.setAttribute('data-theme', next);
-    } catch {}
+    this.applyTheme(next);
+
     try {
       localStorage.setItem('theme', next);
-    } catch {}
+    } catch {
+      // Ignore localStorage errors
+    }
   }
 }
