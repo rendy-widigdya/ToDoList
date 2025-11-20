@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IToDoListService, ToDoListService>();
-builder.Services.AddSingleton<IToDoListRepository, InMemoryToDoRepository>();
+builder.Services.AddSingleton<IToDoListRepository, InMemoryToDoRepository>(); // singleton for in-memory storage
 
 // Add CORS policy for local development
 if (builder.Environment.IsDevelopment())
@@ -18,7 +18,7 @@ if (builder.Environment.IsDevelopment())
     {
         options.AddPolicy("LocalDev", policy =>
         {
-            policy.WithOrigins("http://localhost:4200", "http://localhost:3000")
+            policy.WithOrigins("http://localhost:4200") // Angular default port
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
