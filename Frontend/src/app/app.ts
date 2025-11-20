@@ -1,50 +1,37 @@
-import { Component, Inject, PLATFORM_ID, signal } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
+  templateUrl: './app.html',
   standalone: false,
-  styleUrls: ['./app.component.scss'],
+  styleUrls: ['./app.scss'],
 })
-export class AppComponent {
+export class App {
   public readonly title = signal('Welcome to the To Do List App');
-  public readonly theme = signal<'light' | 'dark'>(this.getInitialTheme());
-
-  constructor(@Inject(PLATFORM_ID) private readonly platformId: object) {
-    if (isPlatformBrowser(this.platformId)) {
-      document.documentElement.setAttribute('data-theme', this.theme());
-    }
-  }
-
-  private getInitialTheme(): 'light' | 'dark' {
-    if (!isPlatformBrowser(this.platformId)) {
-      return 'light';
-    }
-
-    const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (storedTheme === 'light' || storedTheme === 'dark') {
-      return storedTheme;
-    }
-
-    if (
+  public readonly theme = signal<'light' | 'dark'>(
+    (localStorage.getItem('theme') as 'light' | 'dark') ||
+      (typeof window !== 'undefined' &&
       window.matchMedia &&
       window.matchMedia('(prefers-color-scheme: dark)').matches
-    ) {
-      return 'dark';
-    }
+        ? 'dark'
+        : 'light')
+  );
 
-    return 'light';
+  constructor() {
+    // apply initial theme
+    try {
+      document.documentElement.setAttribute('data-theme', this.theme());
+    } catch {}
   }
 
   public toggleTheme(): void {
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
-    }
-
     const next = this.theme() === 'dark' ? 'light' : 'dark';
     this.theme.set(next);
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
+    try {
+      document.documentElement.setAttribute('data-theme', next);
+    } catch {}
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
   }
 }
