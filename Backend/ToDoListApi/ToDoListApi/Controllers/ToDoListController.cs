@@ -100,6 +100,7 @@ namespace ToDoListApi.Controllers
 
             // Update only the properties from the request
             existing.Title = request.Title;
+            existing.IsDone = request.IsDone;
 
             var updated = _service.Update(existing);
             return updated ? NoContent() : NotFound();

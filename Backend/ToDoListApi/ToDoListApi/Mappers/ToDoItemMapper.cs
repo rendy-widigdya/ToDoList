@@ -22,7 +22,7 @@ namespace ToDoListApi.Mappers
             {
                 Id = item.Id,
                 Title = item.Title,
-                IsCompleted = item.IsDone
+                IsDone = item.IsDone
             };
         }
     }

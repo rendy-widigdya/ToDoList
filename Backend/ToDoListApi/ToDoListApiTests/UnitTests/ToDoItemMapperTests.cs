@@ -54,7 +54,7 @@ namespace ToDoListApiTests.UnitTests
             // Assert
             Assert.Equal(item.Id, result.Id);
             Assert.Equal("Test Task", result.Title);
-            Assert.True(result.IsCompleted);
+            Assert.True(result.IsDone);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace ToDoListApiTests.UnitTests
             var result = ToDoItemMapper.ToResponse(item);
 
             // Assert
-            Assert.True(result.IsCompleted);
+            Assert.True(result.IsDone);
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace ToDoListApiTests.UnitTests
             var result = ToDoItemMapper.ToResponse(item);
 
             // Assert
-            Assert.False(result.IsCompleted);
+            Assert.False(result.IsDone);
         }
     }
 }

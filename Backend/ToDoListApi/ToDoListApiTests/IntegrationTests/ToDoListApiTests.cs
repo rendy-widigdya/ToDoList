@@ -105,7 +105,7 @@ namespace ToDoListApiTests.IntegrationTests
             createdTodo.Should().NotBeNull();
             createdTodo.Id.Should().NotBe(Guid.Empty);
             createdTodo.Title.Should().Be("New Todo");
-            createdTodo.IsCompleted.Should().BeFalse();
+            createdTodo.IsDone.Should().BeFalse();
         }
 
         [Fact]
@@ -193,7 +193,7 @@ namespace ToDoListApiTests.IntegrationTests
             var created = await response.Content.ReadFromJsonAsync<ToDoItemResponse>();
 
             // Assert
-            created.IsCompleted.Should().BeFalse();
+            created.IsDone.Should().BeFalse();
         }
 
         #endregion
