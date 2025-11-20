@@ -10,7 +10,18 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IToDoListService, ToDoListService>();
-builder.Services.AddSingleton<IToDoListRepository, InMemoryTodoRepository>(); // singleton for in-memory store
+builder.Services.AddSingleton<IToDoListRepository, InMemoryToDoRepository>();
+
+// Add CORS policy for local development
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("LocalDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -21,6 +32,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Use the CORS policy
+app.UseCors("LocalDev");
 
 app.UseAuthorization();
 

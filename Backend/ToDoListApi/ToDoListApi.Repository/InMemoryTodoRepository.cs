@@ -4,7 +4,7 @@ using ToDoListApi.Domain.Models;
 
 namespace ToDoListApi.Infrastructure
 {
-    public class InMemoryTodoRepository : IToDoListRepository
+    public class InMemoryToDoRepository : IToDoListRepository
     {
         private readonly ConcurrentDictionary<Guid, ToDoItem> _store = new();
 
