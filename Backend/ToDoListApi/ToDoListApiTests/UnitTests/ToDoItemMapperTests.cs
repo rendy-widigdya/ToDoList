@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ToDoListApi.Domain.Mappers;
-using ToDoListApi.Domain.Models;
+﻿using ToDoListApi.Domain.Models;
+using ToDoListApi.Mappers;
 using ToDoListApi.Models;
 
 namespace ToDoListApiTests.UnitTests

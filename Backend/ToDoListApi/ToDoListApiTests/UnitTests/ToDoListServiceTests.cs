@@ -1,10 +1,8 @@
 ﻿using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using ToDoListApi.Domain.Interfaces;
 using ToDoListApi.Domain.Models;
 using ToDoListApi.Domain.Services;
+using Microsoft.Extensions.Logging;
 
 namespace ToDoListApiTests.UnitTests
 {
@@ -14,12 +12,14 @@ namespace ToDoListApiTests.UnitTests
     public class ToDoListServiceTests
     {
         private readonly Mock<IToDoListRepository> _repositoryMock;
+        private readonly Mock<ILogger<ToDoListService>> _loggerMock;
         private readonly ToDoListService _service;
 
         public ToDoListServiceTests()
         {
             _repositoryMock = new Mock<IToDoListRepository>();
-            _service = new ToDoListService(_repositoryMock.Object);
+            _loggerMock = new Mock<ILogger<ToDoListService>>();
+            _service = new ToDoListService(_repositoryMock.Object, _loggerMock.Object);
         }
 
         [Fact]

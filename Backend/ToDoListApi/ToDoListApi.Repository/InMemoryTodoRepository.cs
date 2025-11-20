@@ -11,6 +11,9 @@ namespace ToDoListApi.Infrastructure
         public IEnumerable<ToDoItem> GetAll() =>
             _store.Values.OrderBy(t => t.CreatedAt);
 
+        public ToDoItem? GetById(Guid id) =>
+            _store.TryGetValue(id, out var item) ? item : null;
+
         public ToDoItem Add(ToDoItem todo)
         {
             todo.Id = Guid.NewGuid();

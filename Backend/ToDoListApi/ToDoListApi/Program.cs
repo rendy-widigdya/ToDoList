@@ -1,3 +1,4 @@
+using System.Net;
 using ToDoListApi.Domain.Interfaces;
 using ToDoListApi.Domain.Services;
 using ToDoListApi.Infrastructure;
@@ -5,36 +6,56 @@ using ToDoListApi.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
 builder.Services.AddScoped<IToDoListService, ToDoListService>();
 builder.Services.AddSingleton<IToDoListRepository, InMemoryToDoRepository>();
 
 // Add CORS policy for local development
-builder.Services.AddCors(options =>
+if (builder.Environment.IsDevelopment())
 {
-    options.AddPolicy("LocalDev", policy =>
+    builder.Services.AddCors(options =>
     {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        options.AddPolicy("LocalDev", policy =>
+        {
+            policy.WithOrigins("http://localhost:4200", "http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
     });
-});
+}
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Global exception handling middleware
+app.UseExceptionHandler(appBuilder =>
 {
-    app.MapOpenApi();
-}
+    appBuilder.Run(async context =>
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.ContentType = "application/json";
+
+        var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+        if (exception != null)
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(exception, "An unhandled exception occurred");
+
+            var response = new { error = "An error occurred while processing your request." };
+            await context.Response.WriteAsJsonAsync(response);
+        }
+    });
+});
 
 app.UseHttpsRedirection();
 
-// Use the CORS policy
-app.UseCors("LocalDev");
+// Use the CORS policy only in development
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("LocalDev");
+}
 
 app.UseAuthorization();
 

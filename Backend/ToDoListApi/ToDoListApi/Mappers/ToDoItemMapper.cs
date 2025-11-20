@@ -1,15 +1,15 @@
 ﻿using ToDoListApi.Domain.Models;
 using ToDoListApi.Models;
 
-namespace ToDoListApi.Domain.Mappers
+namespace ToDoListApi.Mappers
 {
     public static class ToDoItemMapper
     {
-        public static ToDoItem ToDomain(ToDoItemRequest request)
+        public static ToDoItem ToDomain(ToDoItemRequest request, Guid id = default)
         {
             return new ToDoItem
             {
-                Id = Guid.NewGuid(),
+                Id = id == default ? Guid.NewGuid() : id,
                 Title = request.Title,
                 IsDone = false,
                 CreatedAt = DateTime.UtcNow,

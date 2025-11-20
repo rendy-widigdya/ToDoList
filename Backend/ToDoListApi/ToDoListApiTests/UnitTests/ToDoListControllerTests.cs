@@ -4,6 +4,7 @@ using ToDoListApi.Domain.Models;
 using ToDoListApi.Models;
 using ToDoListApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace ToDoListApiTests.UnitTests
 {
@@ -13,12 +14,14 @@ namespace ToDoListApiTests.UnitTests
     public class ToDoListControllerTests
     {
         private readonly Mock<IToDoListService> _serviceMock;
+        private readonly Mock<ILogger<ToDoListController>> _loggerMock;
         private readonly ToDoListController _controller;
 
         public ToDoListControllerTests()
         {
             _serviceMock = new Mock<IToDoListService>();
-            _controller = new ToDoListController(_serviceMock.Object);
+            _loggerMock = new Mock<ILogger<ToDoListController>>();
+            _controller = new ToDoListController(_serviceMock.Object, _loggerMock.Object);
         }
 
         [Fact]
@@ -60,6 +63,38 @@ namespace ToDoListApiTests.UnitTests
         }
 
         [Fact]
+        public void GetById_WithExistingId_ShouldReturnOkWithTodo()
+        {
+            // Arrange
+            var todo = new ToDoItem { Id = Guid.NewGuid(), Title = "Task 1" };
+            _serviceMock.Setup(s => s.GetById(todo.Id)).Returns(todo);
+
+            // Act
+            var result = _controller.GetById(todo.Id) as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            var response = Assert.IsType<ToDoItemResponse>(result.Value);
+            Assert.Equal(todo.Id, response.Id);
+            Assert.Equal("Task 1", response.Title);
+        }
+
+        [Fact]
+        public void GetById_WithNonExistingId_ShouldReturnNotFound()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            _serviceMock.Setup(s => s.GetById(id)).Returns((ToDoItem?)null);
+
+            // Act
+            var result = _controller.GetById(id);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
         public void Create_WithValidTodo_ShouldReturnCreatedAtAction()
         {
             // Arrange
@@ -73,7 +108,7 @@ namespace ToDoListApiTests.UnitTests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(201, result.StatusCode);
-            Assert.Equal(nameof(ToDoListController.GetAll), result.ActionName);
+            Assert.Equal(nameof(ToDoListController.GetById), result.ActionName);
             var response = Assert.IsType<ToDoItemResponse>(result.Value);
             Assert.Equal("New Task", response.Title);
             Assert.Equal(createdTodo.Id, response.Id);
@@ -115,6 +150,9 @@ namespace ToDoListApiTests.UnitTests
             // Arrange
             var id = Guid.NewGuid();
             var request = new ToDoItemRequest { Title = "Updated Task" };
+            var existingItem = new ToDoItem { Id = id, Title = "Original Title", IsDone = false, CreatedAt = DateTime.UtcNow };
+            
+            _serviceMock.Setup(s => s.GetById(id)).Returns(existingItem);
             _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>())).Returns(true);
 
             // Act
@@ -145,7 +183,10 @@ namespace ToDoListApiTests.UnitTests
             // Arrange
             var id = Guid.NewGuid();
             var request = new ToDoItemRequest { Title = "Updated Task" };
+            var existingItem = new ToDoItem { Id = id, Title = "Original Title", IsDone = false, CreatedAt = DateTime.UtcNow };
+            
             ToDoItem? captured = null;
+            _serviceMock.Setup(s => s.GetById(id)).Returns(existingItem);
             _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>()))
                 .Callback<ToDoItem>(t => captured = t)
                 .Returns(true);
@@ -154,6 +195,7 @@ namespace ToDoListApiTests.UnitTests
             var result = _controller.Update(id, request);
 
             // Assert
+            Assert.NotNull(captured);
             Assert.Equal(id, captured!.Id);
             Assert.Equal("Updated Task", captured.Title);
             _serviceMock.Verify(s => s.Update(It.Is<ToDoItem>(t => t.Id == id)), Times.Once);
