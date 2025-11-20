@@ -5,7 +5,7 @@ import { Todo } from './todo.model';
 
 @Injectable()
 export class TodoListService {
-  private base = 'http://localhost:5168/ToDoList';
+  private base = 'http://localhost:5168/api/todolist';
 
   constructor(private http: HttpClient) {}
 

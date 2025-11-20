@@ -2,24 +2,29 @@
   <h2>To Do List</h2>
 
   <div class="add">
-    <input [(ngModel)]="newTitle" placeholder="New todo title" />
-    <button (click)="add()">Add</button>
+    <input [(ngModel)]="newTitle" placeholder="New To Do Item" />
+    <button class="btn btn-add" (click)="add()">Add</button>
   </div>
 
   <ul>
     <li *ngFor="let todo of todos">
-      <div *ngIf="editingId !== todo.id">
-        <label>
+      <div *ngIf="editingId !== todo.id" class="todo-row">
+        <label class="item-left">
           <input type="checkbox" [checked]="todo.isDone" (change)="toggleDone(todo)" />
           <span [class.done]="todo.isDone">{{ todo.title }}</span>
         </label>
-        <button (click)="startEdit(todo)">Edit</button>
-        <button (click)="delete(todo)">Delete</button>
+        <small class="created">{{ todo.createdAt | date : 'short' }}</small>
+        <div class="item-actions">
+          <button class="btn btn-edit" (click)="startEdit(todo)">Edit</button>
+          <button class="btn btn-delete" (click)="delete(todo)">Delete</button>
+        </div>
       </div>
-      <div *ngIf="editingId === todo.id">
+      <div *ngIf="editingId === todo.id" class="todo-row">
         <input [(ngModel)]="editTitle" />
-        <button (click)="saveEdit(todo)">Save</button>
-        <button (click)="cancelEdit()">Cancel</button>
+        <div class="item-actions">
+          <button class="btn btn-save" (click)="saveEdit(todo)">Save</button>
+          <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
+        </div>
       </div>
     </li>
   </ul>

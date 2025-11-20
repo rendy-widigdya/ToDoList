@@ -7,7 +7,7 @@ import { Component, signal } from '@angular/core';
   styleUrls: ['./app.scss'],
 })
 export class App {
-  public readonly title = signal('Frontend');
+  public readonly title = signal('Welcome to the To Do List App');
   public readonly theme = signal<'light' | 'dark'>(
     (localStorage.getItem('theme') as 'light' | 'dark') ||
       (typeof window !== 'undefined' &&
