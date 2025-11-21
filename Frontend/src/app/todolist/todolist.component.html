@@ -6,6 +6,11 @@
     <button class="btn btn-add" (click)="add()">Add</button>
   </div>
 
+  @if (loading) {
+  <div>Loading...</div>
+  } @if (error) {
+  <div style="color: red">{{ error }}</div>
+  }
   <ul>
     @for (todo of todos; track todo.id) {
     <li>

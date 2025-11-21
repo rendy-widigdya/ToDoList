@@ -16,6 +16,8 @@ export class TodoListComponent implements OnInit {
   newTitle = '';
   editingId: string | null = null;
   editTitle = '';
+  loading = false;
+  error = '';
 
   constructor(private svc: TodoListService) {}
 
@@ -24,21 +26,35 @@ export class TodoListComponent implements OnInit {
   }
 
   load(): void {
+    this.loading = true;
+    this.error = '';
     this.svc.getAll().subscribe({
-      next: (t) => (this.todos = t || []),
-      error: (err) => console.error('Failed to load todos', err),
+      next: (t) => {
+        this.todos = t || [];
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load todos: ' + err.message;
+        this.loading = false;
+      },
     });
   }
 
   add(): void {
     const title = this.newTitle?.trim();
     if (!title) return;
+    this.loading = true;
+    this.error = '';
     this.svc.create(title).subscribe({
       next: (created) => {
         this.todos.push(created);
         this.newTitle = '';
+        this.loading = false;
       },
-      error: (err) => console.error('Failed to create todo', err),
+      error: (err) => {
+        this.error = 'Failed to create todo: ' + err.message;
+        this.loading = false;
+      },
     });
   }
 
@@ -51,6 +67,8 @@ export class TodoListComponent implements OnInit {
     const title = this.editTitle?.trim();
     if (!this.editingId || !title) return;
 
+    this.loading = true;
+    this.error = '';
     const updated: Todo = { ...todo, title };
     this.svc.update(this.editingId, updated).subscribe({
       next: () => {
@@ -59,8 +77,12 @@ export class TodoListComponent implements OnInit {
           this.todos[idx] = updated;
         }
         this.cancelEdit();
+        this.loading = false;
       },
-      error: (err) => console.error('Failed to save todo', err),
+      error: (err) => {
+        this.error = 'Failed to save todo: ' + err.message;
+        this.loading = false;
+      },
     });
   }
 
@@ -72,6 +94,8 @@ export class TodoListComponent implements OnInit {
   toggleDone(todo: Todo): void {
     if (!todo.id) return;
 
+    this.loading = true;
+    this.error = '';
     const updated: Todo = { ...todo, isDone: !todo.isDone };
     this.svc.update(todo.id, updated).subscribe({
       next: () => {
@@ -79,18 +103,28 @@ export class TodoListComponent implements OnInit {
         if (idx >= 0) {
           this.todos[idx] = updated;
         }
+        this.loading = false;
       },
-      error: (err) => console.error('Failed to toggle todo', err),
+      error: (err) => {
+        this.error = 'Failed to toggle todo: ' + err.message;
+        this.loading = false;
+      },
     });
   }
 
   delete(todo: Todo): void {
     if (!todo.id) return;
+    this.loading = true;
+    this.error = '';
     this.svc.delete(todo.id).subscribe({
       next: () => {
         this.todos = this.todos.filter((t) => t.id !== todo.id);
+        this.loading = false;
       },
-      error: (err) => console.error('Failed to delete todo', err),
+      error: (err) => {
+        this.error = 'Failed to delete todo: ' + err.message;
+        this.loading = false;
+      },
     });
   }
 }
