@@ -182,7 +182,7 @@ namespace ToDoListApiTests.UnitTests
         }
 
         [Fact]
-        public void GetAll_ShouldReturnItemsOrderedByCreatedAt()
+        public void GetAll_ShouldReturnAllItems()
         {
             // Arrange
             var todo1 = _repository.Add(new ToDoItem 
@@ -192,7 +192,6 @@ namespace ToDoListApiTests.UnitTests
                 IsDone = false,
                 CreatedAt = DateTime.UtcNow
             });
-            System.Threading.Thread.Sleep(10);
             var todo2 = _repository.Add(new ToDoItem 
             { 
                 Id = Guid.NewGuid(),
@@ -205,8 +204,8 @@ namespace ToDoListApiTests.UnitTests
             var result = _repository.GetAll().ToList();
 
             // Assert
-            Assert.Equal(todo1.Id, result[0].Id);
-            Assert.Equal(todo2.Id, result[1].Id);
+            Assert.Contains(result, x => x.Id == todo1.Id);
+            Assert.Contains(result, x => x.Id == todo2.Id);
         }
     }
 }

@@ -168,13 +168,50 @@ namespace ToDoListApiTests.UnitTests
             // Arrange
             var id = Guid.NewGuid();
             var request = new ToDoItemRequest { Title = "Updated Task" };
-            _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>())).Returns(false);
+            _serviceMock.Setup(s => s.GetById(id)).Returns((ToDoItem?)null);
 
             // Act
             var result = _controller.Update(id, request);
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void Update_WithEmptyTitle_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var request = new ToDoItemRequest { Title = "" };
+            var existingItem = new ToDoItem { Id = id, Title = "Original", IsDone = false, CreatedAt = DateTime.UtcNow };
+            _serviceMock.Setup(s => s.GetById(id)).Returns(existingItem);
+            _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>())).Throws(new ArgumentException("Title is required"));
+
+            // Act
+            var result = _controller.Update(id, request) as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(400, result.StatusCode);
+        }
+
+        [Fact]
+        public void Update_WithTitleExceeding500Characters_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            var longTitle = new string('a', 501);
+            var request = new ToDoItemRequest { Title = longTitle };
+            var existingItem = new ToDoItem { Id = id, Title = "Original", IsDone = false, CreatedAt = DateTime.UtcNow };
+            _serviceMock.Setup(s => s.GetById(id)).Returns(existingItem);
+            _serviceMock.Setup(s => s.Update(It.IsAny<ToDoItem>())).Throws(new ArgumentException("Title cannot exceed 500 characters"));
+
+            // Act
+            var result = _controller.Update(id, request) as BadRequestObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(400, result.StatusCode);
         }
 
         [Fact]

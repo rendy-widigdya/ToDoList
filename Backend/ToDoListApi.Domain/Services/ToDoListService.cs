@@ -18,7 +18,6 @@ namespace ToDoListApi.Domain.Services
         public IEnumerable<ToDoItem> GetAll()
         {
             _logger.LogInformation("Retrieving all todo items");
-            // Domain layer applies business rules: default sort by creation date (oldest first)
             return _repository.GetAll().OrderBy(t => t.CreatedAt);
         }
 
@@ -34,7 +33,6 @@ namespace ToDoListApi.Domain.Services
 
             _logger.LogInformation("Adding new todo item with title: {Title}", validatedTitle);
             
-            // Domain layer owns entity creation and lifecycle
             var todo = new ToDoItem
             {
                 Id = Guid.NewGuid(),

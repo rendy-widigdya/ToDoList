@@ -12,8 +12,8 @@ namespace ToDoListApiTests.IntegrationTests
     /// </summary>
     public class ToDoListApiIntegrationTests : IAsyncLifetime
     {
-        private WebApplicationFactory<Program> _factory;
-        private HttpClient _client;
+        public required WebApplicationFactory<Program> _factory;
+        public required HttpClient _client;
 
         public async Task InitializeAsync()
         {
@@ -123,7 +123,7 @@ namespace ToDoListApiTests.IntegrationTests
             var created2 = await response2.Content.ReadFromJsonAsync<ToDoItemResponse>();
 
             // Assert
-            created1.Id.Should().NotBe(created2.Id);
+            created1!.Id.Should().NotBe(created2!.Id);
         }
 
         [Fact]
@@ -166,6 +166,51 @@ namespace ToDoListApiTests.IntegrationTests
         }
 
         [Fact]
+        public async Task Create_WithTitleExceeding500Characters_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var longTitle = new string('a', 501);
+            var todo = new ToDoItemRequest { Title = longTitle };
+
+            // Act
+            var response = await _client.PostAsJsonAsync("/api/todolist", todo);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Create_WithTitleExactly500Characters_ShouldSucceed()
+        {
+            // Arrange
+            var title = new string('a', 500);
+            var todo = new ToDoItemRequest { Title = title };
+
+            // Act
+            var response = await _client.PostAsJsonAsync("/api/todolist", todo);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            var created = await response.Content.ReadFromJsonAsync<ToDoItemResponse>();
+            created!.Title.Should().HaveLength(500);
+        }
+
+        [Fact]
+        public async Task Create_WithTitleWithWhitespace_ShouldTrim()
+        {
+            // Arrange
+            var todo = new ToDoItemRequest { Title = "  Trimmed Title  " };
+
+            // Act
+            var response = await _client.PostAsJsonAsync("/api/todolist", todo);
+            var created = await response.Content.ReadFromJsonAsync<ToDoItemResponse>();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            created!.Title.Should().Be("Trimmed Title");
+        }
+
+        [Fact]
         public async Task Create_ShouldPersistTodoInRepository()
         {
             // Arrange
@@ -179,7 +224,7 @@ namespace ToDoListApiTests.IntegrationTests
             var todos = await getResponse.Content.ReadFromJsonAsync<List<ToDoItemResponse>>();
 
             // Assert
-            todos.Should().ContainSingle(t => t.Id == created.Id && t.Title == "Persistent Task");
+            todos.Should().ContainSingle(t => t.Id == created!.Id && t.Title == "Persistent Task");
         }
 
         [Fact]
@@ -211,7 +256,7 @@ namespace ToDoListApiTests.IntegrationTests
             var updatedTodo = new ToDoItemRequest { Title = "Updated Title" };
 
             // Act
-            var updateResponse = await _client.PutAsJsonAsync($"/api/todolist/{created.Id}", updatedTodo);
+            var updateResponse = await _client.PutAsJsonAsync($"/api/todolist/{created!.Id}", updatedTodo);
 
             // Assert
             updateResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -226,7 +271,7 @@ namespace ToDoListApiTests.IntegrationTests
             var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
 
             var updatedTodo = new ToDoItemRequest { Title = "Modified Title" };
-            await _client.PutAsJsonAsync($"/api/todolist/{created.Id}", updatedTodo);
+            await _client.PutAsJsonAsync($"/api/todolist/{created!.Id}", updatedTodo);
 
             // Act
             var getResponse = await _client.GetAsync("/api/todolist");
@@ -267,7 +312,7 @@ namespace ToDoListApiTests.IntegrationTests
             var updatedTodo1 = new ToDoItemRequest { Title = "Updated Task 1" };
 
             // Act
-            await _client.PutAsJsonAsync($"/api/todolist/{created1.Id}", updatedTodo1);
+            await _client.PutAsJsonAsync($"/api/todolist/{created1!.Id}", updatedTodo1);
 
             var getResponse = await _client.GetAsync("/api/todolist");
             var todos = await getResponse.Content.ReadFromJsonAsync<List<ToDoItemResponse>>();
@@ -275,7 +320,83 @@ namespace ToDoListApiTests.IntegrationTests
             // Assert
             todos.Should().HaveCount(2);
             todos.Should().ContainSingle(t => t.Id == created1.Id && t.Title == "Updated Task 1");
-            todos.Should().ContainSingle(t => t.Id == created2.Id && t.Title == "Task 2");
+            todos.Should().ContainSingle(t => t.Id == created2!.Id && t.Title == "Task 2");
+        }
+
+        [Fact]
+        public async Task Update_ShouldToggleIsDone()
+        {
+            // Arrange
+            var todo = new ToDoItemRequest { Title = "Task", IsDone = false };
+            var createResponse = await _client.PostAsJsonAsync("/api/todolist", todo);
+            var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
+
+            // Act - Toggle to done
+            var updateRequest = new ToDoItemRequest { Title = "Task", IsDone = true };
+            await _client.PutAsJsonAsync($"/api/todolist/{created!.Id}", updateRequest);
+
+            var getResponse = await _client.GetAsync("/api/todolist");
+            var todos = await getResponse.Content.ReadFromJsonAsync<List<ToDoItemResponse>>();
+
+            // Assert
+            var updated = todos.Should().ContainSingle(t => t.Id == created.Id).Subject;
+            updated.IsDone.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Update_WithTitleWithWhitespace_ShouldTrim()
+        {
+            // Arrange
+            var todo = new ToDoItemRequest { Title = "Original Title" };
+            var createResponse = await _client.PostAsJsonAsync("/api/todolist", todo);
+            var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
+
+            var updateRequest = new ToDoItemRequest { Title = "  Trimmed Title  ", IsDone = false };
+
+            // Act
+            await _client.PutAsJsonAsync($"/api/todolist/{created!.Id}", updateRequest);
+
+            var getResponse = await _client.GetAsync("/api/todolist");
+            var todos = await getResponse.Content.ReadFromJsonAsync<List<ToDoItemResponse>>();
+
+            // Assert
+            var updated = todos.Should().ContainSingle(t => t.Id == created.Id).Subject;
+            updated.Title.Should().Be("Trimmed Title");
+        }
+
+        [Fact]
+        public async Task Update_WithEmptyTitle_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var todo = new ToDoItemRequest { Title = "Original" };
+            var createResponse = await _client.PostAsJsonAsync("/api/todolist", todo);
+            var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
+
+            var updateRequest = new ToDoItemRequest { Title = "" };
+
+            // Act
+            var response = await _client.PutAsJsonAsync($"/api/todolist/{created!.Id}", updateRequest);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Update_WithTitleExceeding500Characters_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var todo = new ToDoItemRequest { Title = "Original" };
+            var createResponse = await _client.PostAsJsonAsync("/api/todolist", todo);
+            var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
+
+            var longTitle = new string('a', 501);
+            var updateRequest = new ToDoItemRequest { Title = longTitle };
+
+            // Act
+            var response = await _client.PutAsJsonAsync($"/api/todolist/{created!.Id}", updateRequest);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         #endregion
@@ -291,7 +412,7 @@ namespace ToDoListApiTests.IntegrationTests
             var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
 
             // Act
-            var deleteResponse = await _client.DeleteAsync($"/api/todolist/{created.Id}");
+            var deleteResponse = await _client.DeleteAsync($"/api/todolist/{created!.Id}");
 
             // Assert
             deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -306,7 +427,7 @@ namespace ToDoListApiTests.IntegrationTests
             var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
 
             // Act
-            await _client.DeleteAsync($"/api/todolist/{created.Id}");
+            await _client.DeleteAsync($"/api/todolist/{created!.Id}");
 
             var getResponse = await _client.GetAsync("/api/todolist");
             var todos = await getResponse.Content.ReadFromJsonAsync<List<ToDoItemResponse>>();
@@ -342,14 +463,14 @@ namespace ToDoListApiTests.IntegrationTests
             var created2 = await response2.Content.ReadFromJsonAsync<ToDoItemResponse>();
 
             // Act
-            await _client.DeleteAsync($"/api/todolist/{created1.Id}");
+            await _client.DeleteAsync($"/api/todolist/{created1!.Id}");
 
             var getResponse = await _client.GetAsync("/api/todolist");
             var todos = await getResponse.Content.ReadFromJsonAsync<List<ToDoItemResponse>>();
 
             // Assert
             todos.Should().HaveCount(1);
-            todos.Should().ContainSingle(t => t.Id == created2.Id);
+            todos.Should().ContainSingle(t => t.Id == created2!.Id);
         }
 
         [Fact]
@@ -361,7 +482,7 @@ namespace ToDoListApiTests.IntegrationTests
             var created = await createResponse.Content.ReadFromJsonAsync<ToDoItemResponse>();
 
             // Act
-            var firstDelete = await _client.DeleteAsync($"/api/todolist/{created.Id}");
+            var firstDelete = await _client.DeleteAsync($"/api/todolist/{created!.Id}");
             var secondDelete = await _client.DeleteAsync($"/api/todolist/{created.Id}");
 
             // Assert
@@ -456,16 +577,6 @@ namespace ToDoListApiTests.IntegrationTests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task InvalidHttpMethod_ShouldReturn405()
-        {
-            // Act
-            var response = await _client.GetAsync("/api/todolist/550e8400-e29b-41d4-a716-446655440000");
-
-            // Assert - GET on specific todo ID should not be supported based on current controller
-            // This test documents current behavior - adjust based on actual API design
         }
 
         #endregion
