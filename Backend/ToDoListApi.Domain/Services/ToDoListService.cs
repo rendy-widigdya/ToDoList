@@ -4,7 +4,6 @@ using ToDoListApi.Domain.Models;
 
 namespace ToDoListApi.Domain.Services
 {
-
     public class ToDoListService : IToDoListService
     {
         private readonly IToDoListRepository _repository;
@@ -37,7 +36,16 @@ namespace ToDoListApi.Domain.Services
             }
 
             _logger.LogInformation("Adding new todo item with title: {Title}", title);
-            var todo = new ToDoItem { Title = title };
+            
+            // Domain layer owns entity creation and lifecycle
+            var todo = new ToDoItem
+            {
+                Id = Guid.NewGuid(),
+                Title = title,
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            
             var added = _repository.Add(todo);
             _logger.LogInformation("Successfully added todo item with ID: {Id}", added.Id);
             return added;

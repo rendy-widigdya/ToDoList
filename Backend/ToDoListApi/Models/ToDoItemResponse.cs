@@ -1,9 +1,9 @@
 ﻿namespace ToDoListApi.Models
 {
-    public class ToDoItemResponse
+    public record ToDoItemResponse
     {
-        public Guid Id { get; set; }
-        public required string Title { get; set; }
-        public bool IsDone { get; set; }
+        public Guid Id { get; init; }
+        public required string Title { get; init; }
+        public bool IsDone { get; init; }
     }
 }

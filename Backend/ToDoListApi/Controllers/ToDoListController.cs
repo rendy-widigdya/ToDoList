@@ -90,20 +90,22 @@ namespace ToDoListApi.Controllers
             }
 
             _logger.LogInformation("Updating todo item with ID: {Id}", id);
-            
-            // Get existing item to preserve CreatedAt and other properties
+
             var existing = _service.GetById(id);
             if (existing == null)
             {
                 return NotFound();
             }
 
-            // Update only the properties from the request
-            existing.Title = request.Title;
-            existing.IsDone = request.IsDone;
+            // Create updated entity preserving Id and CreatedAt
+            var updated = existing with
+            {
+                Title = request.Title,
+                IsDone = request.IsDone
+            };
 
-            var updated = _service.Update(existing);
-            return updated ? NoContent() : NotFound();
+            var result = _service.Update(updated);
+            return result ? NoContent() : NotFound();
         }
 
         /// <summary>

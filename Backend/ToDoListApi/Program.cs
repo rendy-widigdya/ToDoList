@@ -28,8 +28,7 @@ if (builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-// Global exception handling middleware
+// Configure the HTTP request pipeline
 app.UseExceptionHandler(appBuilder =>
 {
     appBuilder.Run(async context =>
@@ -43,7 +42,11 @@ app.UseExceptionHandler(appBuilder =>
             var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
             logger.LogError(exception, "An unhandled exception occurred");
 
-            var response = new { error = "An error occurred while processing your request." };
+            var errorMessage = app.Environment.IsDevelopment()
+                ? exception.Message
+                : "An error occurred while processing your request.";
+
+            var response = new { error = errorMessage };
             await context.Response.WriteAsJsonAsync(response);
         }
     });

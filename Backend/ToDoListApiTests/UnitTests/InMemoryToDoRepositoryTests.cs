@@ -29,7 +29,13 @@ namespace ToDoListApiTests.UnitTests
         public void Add_ShouldAddTodoAndGenerateId()
         {
             // Arrange
-            var todo = new ToDoItem { Title = "Test Todo" };
+            var todo = new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "Test Todo",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            };
 
             // Act
             var added = _repository.Add(todo);
@@ -44,8 +50,14 @@ namespace ToDoListApiTests.UnitTests
         public void Add_ShouldSetCreatedAtToUtcNow()
         {
             // Arrange
-            var todo = new ToDoItem { Title = "Test Todo" };
             var beforeAdd = DateTime.UtcNow;
+            var todo = new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "Test Todo",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            };
 
             // Act
             var added = _repository.Add(todo);
@@ -59,9 +71,27 @@ namespace ToDoListApiTests.UnitTests
         public void Add_MultipleTodos_ShouldAddAllItems()
         {
             // Arrange
-            var todo1 = new ToDoItem { Title = "Todo 1" };
-            var todo2 = new ToDoItem { Title = "Todo 2" };
-            var todo3 = new ToDoItem { Title = "Todo 3" };
+            var todo1 = new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "Todo 1",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            var todo2 = new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "Todo 2",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            var todo3 = new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "Todo 3",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            };
 
             // Act
             _repository.Add(todo1);
@@ -76,7 +106,13 @@ namespace ToDoListApiTests.UnitTests
         public void Delete_ExistingTodo_ShouldReturnTrueAndRemove()
         {
             // Arrange
-            var todo = _repository.Add(new ToDoItem { Title = "To Delete" });
+            var todo = _repository.Add(new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "To Delete",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            });
 
             // Act
             var result = _repository.Delete(todo.Id);
@@ -103,12 +139,21 @@ namespace ToDoListApiTests.UnitTests
         public void Update_ExistingTodo_ShouldReturnTrueAndModify()
         {
             // Arrange
-            var todo = _repository.Add(new ToDoItem { Title = "Original Title" });
-            todo.Title = "Updated Title";
-            todo.IsDone = true;
+            var todo = _repository.Add(new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "Original Title",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            });
+            var updatedTodo = todo with 
+            { 
+                Title = "Updated Title",
+                IsDone = true
+            };
 
             // Act
-            var result = _repository.Update(todo);
+            var result = _repository.Update(updatedTodo);
 
             // Assert
             Assert.True(result);
@@ -121,7 +166,13 @@ namespace ToDoListApiTests.UnitTests
         public void Update_NonExistingTodo_ShouldReturnFalse()
         {
             // Arrange
-            var nonExistingTodo = new ToDoItem { Id = Guid.NewGuid(), Title = "Non Existing" };
+            var nonExistingTodo = new ToDoItem 
+            { 
+                Id = Guid.NewGuid(), 
+                Title = "Non Existing",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            };
 
             // Act
             var result = _repository.Update(nonExistingTodo);
@@ -134,9 +185,21 @@ namespace ToDoListApiTests.UnitTests
         public void GetAll_ShouldReturnItemsOrderedByCreatedAt()
         {
             // Arrange
-            var todo1 = _repository.Add(new ToDoItem { Title = "First" });
+            var todo1 = _repository.Add(new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "First",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            });
             System.Threading.Thread.Sleep(10);
-            var todo2 = _repository.Add(new ToDoItem { Title = "Second" });
+            var todo2 = _repository.Add(new ToDoItem 
+            { 
+                Id = Guid.NewGuid(),
+                Title = "Second",
+                IsDone = false,
+                CreatedAt = DateTime.UtcNow
+            });
 
             // Act
             var result = _repository.GetAll().ToList();

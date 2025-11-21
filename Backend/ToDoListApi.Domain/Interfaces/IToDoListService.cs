@@ -2,7 +2,6 @@
 
 namespace ToDoListApi.Domain.Interfaces
 {
-
     public interface IToDoListService
     {
         IEnumerable<ToDoItem> GetAll();

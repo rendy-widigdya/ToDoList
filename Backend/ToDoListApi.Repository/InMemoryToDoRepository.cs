@@ -16,8 +16,7 @@ namespace ToDoListApi.Infrastructure
 
         public ToDoItem Add(ToDoItem todo)
         {
-            todo.Id = Guid.NewGuid();
-            todo.CreatedAt = DateTime.UtcNow;
+            // Repository only persists - domain layer owns entity creation
             _store[todo.Id] = todo;
             return todo;
         }

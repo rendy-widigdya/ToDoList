@@ -1,10 +1,10 @@
 ﻿namespace ToDoListApi.Domain.Models
 {
-    public class ToDoItem
+    public record ToDoItem
     {
-        public Guid Id { get; set; }
-        public required string Title { get; set; } 
-        public bool IsDone { get; set; }
-        public DateTime CreatedAt { get; set; } 
+        public Guid Id { get; init; }
+        public required string Title { get; init; }
+        public bool IsDone { get; init; }
+        public DateTime CreatedAt { get; init; }
     }
 }

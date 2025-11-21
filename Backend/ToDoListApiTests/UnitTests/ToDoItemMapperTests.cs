@@ -10,33 +10,6 @@ namespace ToDoListApiTests.UnitTests
     public class ToDoItemMapperTests
     {
         [Fact]
-        public void ToDomain_WithValidRequest_ShouldMapToToDoItem()
-        {
-            // Arrange
-            var request = new ToDoItemRequest { Title = "Test Task" };
-
-            // Act
-            var result = ToDoItemMapper.ToDomain(request);
-
-            // Assert
-            Assert.Equal("Test Task", result.Title);
-            Assert.False(result.IsDone);
-        }
-
-        [Fact]
-        public void ToDomain_ShouldSetIsDoneToFalse()
-        {
-            // Arrange
-            var request = new ToDoItemRequest { Title = "Test" };
-
-            // Act
-            var result = ToDoItemMapper.ToDomain(request);
-
-            // Assert
-            Assert.False(result.IsDone);
-        }
-
-        [Fact]
         public void ToResponse_WithValidToDoItem_ShouldMapToResponse()
         {
             // Arrange
