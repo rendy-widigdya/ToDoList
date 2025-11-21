@@ -71,7 +71,7 @@ namespace ToDoListApi.Controllers
             catch (ArgumentException ex)
             {
                 _logger.LogWarning(ex, "Failed to create todo item");
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = ex.Message });
             }
         }
 
@@ -97,15 +97,23 @@ namespace ToDoListApi.Controllers
                 return NotFound();
             }
 
-            // Create updated entity preserving Id and CreatedAt
-            var updated = existing with
+            try
             {
-                Title = request.Title,
-                IsDone = request.IsDone
-            };
+                // Create updated entity preserving Id and CreatedAt
+                var updated = existing with
+                {
+                    Title = request.Title,
+                    IsDone = request.IsDone
+                };
 
-            var result = _service.Update(updated);
-            return result ? NoContent() : NotFound();
+                var result = _service.Update(updated);
+                return result ? NoContent() : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Failed to update todo item");
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         /// <summary>

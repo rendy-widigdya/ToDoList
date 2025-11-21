@@ -18,7 +18,8 @@ namespace ToDoListApi.Domain.Services
         public IEnumerable<ToDoItem> GetAll()
         {
             _logger.LogInformation("Retrieving all todo items");
-            return _repository.GetAll();
+            // Domain layer applies business rules: default sort by creation date (oldest first)
+            return _repository.GetAll().OrderBy(t => t.CreatedAt);
         }
 
         public ToDoItem? GetById(Guid id)
@@ -29,19 +30,15 @@ namespace ToDoListApi.Domain.Services
 
         public ToDoItem Add(string title)
         {
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                _logger.LogWarning("Attempted to add todo item with empty title");
-                throw new ArgumentException("Title is required");
-            }
+            var validatedTitle = ValidateAndTrimTitle(title, "add");
 
-            _logger.LogInformation("Adding new todo item with title: {Title}", title);
+            _logger.LogInformation("Adding new todo item with title: {Title}", validatedTitle);
             
             // Domain layer owns entity creation and lifecycle
             var todo = new ToDoItem
             {
                 Id = Guid.NewGuid(),
-                Title = title,
+                Title = validatedTitle,
                 IsDone = false,
                 CreatedAt = DateTime.UtcNow
             };
@@ -53,8 +50,14 @@ namespace ToDoListApi.Domain.Services
 
         public bool Update(ToDoItem todo)
         {
+            var validatedTitle = ValidateAndTrimTitle(todo.Title, "update");
+
             _logger.LogInformation("Updating todo item with ID: {Id}", todo.Id);
-            var result = _repository.Update(todo);
+            
+            // Create updated entity with validated and trimmed title
+            var updatedTodo = todo with { Title = validatedTitle };
+            var result = _repository.Update(updatedTodo);
+            
             if (result)
             {
                 _logger.LogInformation("Successfully updated todo item with ID: {Id}", todo.Id);
@@ -79,6 +82,32 @@ namespace ToDoListApi.Domain.Services
                 _logger.LogWarning("Failed to delete todo item with ID: {Id} - item not found", id);
             }
             return result;
+        }
+
+        /// <summary>
+        /// Validates and trims the title according to business rules.
+        /// </summary>
+        /// <param name="title">The title to validate</param>
+        /// <param name="operation">The operation being performed (for logging purposes)</param>
+        /// <returns>The validated and trimmed title</returns>
+        /// <exception cref="ArgumentException">Thrown when title is invalid</exception>
+        private string ValidateAndTrimTitle(string? title, string operation)
+        {
+            var trimmedTitle = title?.Trim();
+            
+            if (string.IsNullOrWhiteSpace(trimmedTitle))
+            {
+                _logger.LogWarning("Attempted to {Operation} todo item with empty title", operation);
+                throw new ArgumentException("Title is required");
+            }
+
+            if (trimmedTitle.Length > 500)
+            {
+                _logger.LogWarning("Attempted to {Operation} todo item with title exceeding 500 characters", operation);
+                throw new ArgumentException("Title cannot exceed 500 characters");
+            }
+
+            return trimmedTitle;
         }
     }
 }

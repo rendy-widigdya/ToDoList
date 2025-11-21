@@ -9,14 +9,13 @@ namespace ToDoListApi.Infrastructure
         private readonly ConcurrentDictionary<Guid, ToDoItem> _store = new();
 
         public IEnumerable<ToDoItem> GetAll() =>
-            _store.Values.OrderBy(t => t.CreatedAt);
+            _store.Values;
 
         public ToDoItem? GetById(Guid id) =>
             _store.TryGetValue(id, out var item) ? item : null;
 
         public ToDoItem Add(ToDoItem todo)
         {
-            // Repository only persists - domain layer owns entity creation
             _store[todo.Id] = todo;
             return todo;
         }
