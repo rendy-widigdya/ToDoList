@@ -15,9 +15,11 @@ A simple RESTful API for managing todo items, built with ASP.NET Core 10.0.
 
 The project follows Clean Architecture principles with the following layers:
 
-- **ToDoListApi**: API layer (Controllers, Models, Mappers)
+- **ToDoListApi**: API layer (Controllers, Models, Mappers, Validation)
 - **ToDoListApi.Domain**: Domain layer (Business logic, Interfaces, Domain models)
 - **ToDoListApi.Repository**: Infrastructure layer (In-memory repository implementation)
+
+**Note:** The repository project folder is named `ToDoListApi.Repository` but uses the namespace `ToDoListApi.Infrastructure`.
 
 ## Prerequisites
 
@@ -74,9 +76,12 @@ POST /api/todolist
 Content-Type: application/json
 
 {
-  "title": "My new task"
+  "title": "My new task",
+  "isDone": false
 }
 ```
+
+**Note:** `isDone` is optional and defaults to `false`. Title is required and will be trimmed automatically.
 
 ### Update Todo Item
 ```
@@ -84,9 +89,12 @@ PUT /api/todolist/{id}
 Content-Type: application/json
 
 {
-  "title": "Updated task"
+  "title": "Updated task",
+  "isDone": true
 }
 ```
+
+**Note:** Both `title` and `isDone` are required in the request body. Title will be trimmed automatically.
 
 ### Delete Todo Item
 ```
@@ -113,6 +121,7 @@ ToDoListApi/
 │   ├── Controllers/                # API Controllers
 │   ├── Models/                     # Request/Response DTOs
 │   ├── Mappers/                    # Domain/API mapping
+│   ├── Validation/                 # Custom validation attributes
 │   └── Program.cs                  # Application entry point
 ├── ToDoListApi.Domain/             # Domain Layer
 │   ├── Interfaces/                 # Service and Repository interfaces
@@ -122,7 +131,7 @@ ToDoListApi/
 │   └── InMemoryToDoRepository.cs   # In-memory repository implementation
 └── ToDoListApiTests/               # Test Project
     ├── UnitTests/                  # Unit tests
-    └── IntegrationTests/          # Integration tests
+    └── IntegrationTests/           # Integration tests
 ```
 
 ## Technologies Used
@@ -135,9 +144,11 @@ ToDoListApi/
 ## Notes
 
 - The current implementation uses an in-memory repository, so data is not persisted between application restarts
-- CORS is enabled for local development (localhost:4200 and localhost:3000)
+- CORS is enabled for local development (localhost:4200 only)
 - The API follows RESTful conventions
 - All endpoints include proper HTTP status codes and error handling
+- Input validation: Titles are automatically trimmed and validated (required, max 500 characters)
+- Results are sorted by creation date (oldest first)
 
 ## Future Enhancements
 
