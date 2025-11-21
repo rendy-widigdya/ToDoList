@@ -23,12 +23,18 @@ Before running this project, ensure you have the following installed:
 ToDoList/
 ├── Backend/                    # ASP.NET Core API
 │   ├── ToDoListApi/           # Main API project
+│   │   ├── Controllers/       # API controllers
+│   │   ├── Models/            # Request/Response DTOs
+│   │   ├── Mappers/           # Domain/API mapping
+│   │   └── Validation/       # Custom validation attributes
 │   ├── ToDoListApi.Domain/    # Domain layer (business logic)
 │   ├── ToDoListApi.Repository/ # Infrastructure layer (data access)
 │   └── ToDoListApiTests/      # Test projects
 │
 └── Frontend/                   # Angular application
     ├── src/                    # Source code
+    │   ├── app/               # Application code
+    │   └── environments/      # Environment configuration
     ├── public/                 # Static assets
     └── package.json            # Dependencies
 ```
@@ -84,6 +90,8 @@ For detailed information about the Backend API, see [Backend/README.md](./Backen
 - Comprehensive unit and integration tests
 - CORS enabled for local development (localhost:4200)
 - Global exception handling
+- Input validation with automatic trimming
+- Custom validation attributes for API-level validation
 
 **Common Backend Commands:**
 
@@ -111,8 +119,9 @@ For detailed information about the Frontend, see [Frontend/README.md](./Frontend
 **Key features:**
 
 - Modern Angular 20 with standalone components
-- Light/dark theme support
-- HTTP client for API communication
+- Angular 20 control flow syntax (`@if`, `@for`, `@else`)
+- Light/dark theme support with localStorage persistence
+- HTTP client for API communication with error handling
 - Unit tests with Jasmine and Karma
 - Lazy-loaded feature modules
 
@@ -211,8 +220,9 @@ Tests include:
 
 ### Frontend (Component-Based)
 
-- **Standalone Components**: Modern Angular approach without NgModule
-- **Services**: HTTP communication with the backend
+- **Standalone Components**: Modern Angular approach with standalone components
+- **Control Flow**: Uses Angular 20 control flow syntax (`@if`, `@for`, `@else`)
+- **Services**: HTTP communication with the backend and error handling
 - **Feature Modules**: Lazy-loaded for performance
 
 ## Technologies Used

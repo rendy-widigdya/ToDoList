@@ -6,14 +6,14 @@ This is the frontend for the ToDoList example app (Angular 20).
 
 - **Install deps:**
 
-```powershell
-cd C:\Workspace\ToDoList\Frontend
+```bash
+cd Frontend
 npm install
 ```
 
 - **Run the dev server:**
 
-```powershell
+```bash
 npm start
 ```
 
@@ -28,7 +28,7 @@ Open http://localhost:4200 in your browser. The app uses a backend API at `http:
 
 - Unit tests (Karma + Jasmine):
 
-```powershell
+```bash
 npm test
 ```
 
@@ -45,12 +45,19 @@ If Karma opens a browser, test results will appear there; the command will also 
 
 **Project structure (relevant files)**
 
-- `src/app/todolist/` — feature module (lazy-loaded), component, service, styles and tests.
-- `src/environments/*` — environment configuration (apiBaseUrl, production flag).
+- `src/app/todolist/` — feature module (lazy-loaded), component, service, styles and tests
+- `src/environments/*` — environment configuration (apiBaseUrl, production flag)
+- `src/app/app.ts` — root component with theme toggle functionality
 
 **HTTP provider**
 
 - The project uses the modern `provideHttpClient()` provider (configured in `src/app/app-module.ts`) instead of the older `HttpClientModule` import.
+
+**Modern Angular features**
+
+- Uses Angular 20 control flow syntax (`@if`, `@for`, `@else`) instead of structural directives (`*ngIf`, `*ngFor`)
+- Standalone components with proper imports
+- Error handling in all HTTP operations with proper error callbacks
 
 **Tips**
 
