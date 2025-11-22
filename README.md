@@ -22,19 +22,19 @@ Before running this project, ensure you have the following installed:
 ```
 ToDoList/
 ├── Backend/                    # ASP.NET Core API
-│   ├── ToDoListApi/           # Main API project
-│   │   ├── Controllers/       # API controllers
-│   │   ├── Models/            # Request/Response DTOs
-│   │   ├── Mappers/           # Domain/API mapping
-│   │   └── Validation/       # Custom validation attributes
-│   ├── ToDoListApi.Domain/    # Domain layer (business logic)
+│   ├── ToDoListApi/            # Main API project
+│   │   ├── Controllers/        # API controllers
+│   │   ├── Models/             # Request/Response DTOs
+│   │   ├── Mappers/            # Domain/API mapping
+│   │   └── Validation/         # Custom validation attributes
+│   ├── ToDoListApi.Domain/     # Domain layer (business logic)
 │   ├── ToDoListApi.Repository/ # Infrastructure layer (data access)
-│   └── ToDoListApiTests/      # Test projects
+│   └── ToDoListApiTests/       # Test projects
 │
 └── Frontend/                   # Angular application
     ├── src/                    # Source code
-    │   ├── app/               # Application code
-    │   └── environments/      # Environment configuration
+    │   ├── app/                # Application code
+    │   └── environments/       # Environment configuration
     ├── public/                 # Static assets
     └── package.json            # Dependencies
 ```
@@ -201,9 +201,9 @@ Tests include:
 ### "Port 4200 is already in use"
 
 - Kill the process using the port or specify a different port:
-  ```powershell
-  ng serve --port 4300
-  ```
+    ```powershell
+    ng serve --port 4300
+    ```
 
 ### CORS errors in the browser console
 
