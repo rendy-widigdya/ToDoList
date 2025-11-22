@@ -19,6 +19,6 @@ describe('App', () => {
   it('should have a title signal', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
-    expect(app.title()).toContain('To Do List');
+    expect(app.title).toBe('Welcome to the To Do List App');
   });
 });

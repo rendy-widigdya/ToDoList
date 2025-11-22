@@ -7,35 +7,35 @@
   </div>
 
   @if (loading) {
-  <div>Loading...</div>
+    <div>Loading...</div>
   } @if (error) {
-  <div style="color: red">{{ error }}</div>
+    <div style="color: red">{{ error }}</div>
   }
   <ul>
     @for (todo of todos; track todo.id) {
-    <li>
-      @if (editingId !== todo.id) {
-      <div class="todo-row">
-        <label class="item-left">
-          <input type="checkbox" [checked]="todo.isDone" (change)="toggleDone(todo)" />
-          <span [class.done]="todo.isDone">{{ todo.title }}</span>
-        </label>
-        <small class="created">{{ todo.createdAt | date : 'short' }}</small>
-        <div class="item-actions">
-          <button class="btn btn-edit" (click)="startEdit(todo)">Edit</button>
-          <button class="btn btn-delete" (click)="delete(todo)">Delete</button>
-        </div>
-      </div>
-      } @else {
-      <div class="todo-row">
-        <input [(ngModel)]="editTitle" />
-        <div class="item-actions">
-          <button class="btn btn-save" (click)="saveEdit(todo)">Save</button>
-          <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
-        </div>
-      </div>
-      }
-    </li>
+      <li>
+        @if (editingId !== todo.id) {
+          <div class="todo-row">
+            <label class="item-left">
+              <input type="checkbox" [checked]="todo.isDone" (change)="toggleDone(todo)" />
+              <span [class.done]="todo.isDone">{{ todo.title }}</span>
+            </label>
+            <small class="created">{{ todo.createdAt | date : 'short' }}</small>
+            <div class="item-actions">
+              <button class="btn btn-edit" (click)="startEdit(todo)">Edit</button>
+              <button class="btn btn-delete" (click)="delete(todo)">Delete</button>
+            </div>
+          </div>
+        } @else {
+          <div class="todo-row">
+            <input [(ngModel)]="editTitle" />
+            <div class="item-actions">
+              <button class="btn btn-save" (click)="saveEdit(todo)">Save</button>
+              <button class="btn btn-cancel" (click)="cancelEdit()">Cancel</button>
+            </div>
+          </div>
+        }
+      </li>
     }
   </ul>
 </div>

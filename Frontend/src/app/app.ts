@@ -7,7 +7,7 @@ import { Component, signal } from '@angular/core';
   styleUrls: ['./app.scss'],
 })
 export class App {
-  public readonly title = signal('Welcome to the To Do List App');
+  public readonly title = 'Welcome to the To Do List App';
   public readonly theme = signal<'light' | 'dark'>(this.getInitialTheme());
 
   constructor() {
@@ -15,7 +15,7 @@ export class App {
   }
 
   private getInitialTheme(): 'light' | 'dark' {
-    if (typeof window === 'undefined') return 'light';
+    if (typeof window === 'undefined') return 'dark';
 
     const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
     if (stored === 'light' || stored === 'dark') return stored;
@@ -27,7 +27,7 @@ export class App {
     try {
       document.documentElement.setAttribute('data-theme', theme);
     } catch {
-      // Ignore errors in SSR or test environments
+      // Ignore errors in test environments
     }
   }
 

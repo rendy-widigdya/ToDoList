@@ -12,20 +12,20 @@ import { Todo } from './todo.model';
   styleUrls: ['./todolist.component.scss'],
 })
 export class TodoListComponent implements OnInit {
-  todos: Todo[] = [];
-  newTitle = '';
-  editingId: string | null = null;
-  editTitle = '';
-  loading = false;
-  error = '';
+  public todos: Todo[] = [];
+  public newTitle = '';
+  public editingId: string | null = null;
+  public editTitle = '';
+  public loading = false;
+  public error = '';
 
-  constructor(private svc: TodoListService) {}
+  constructor(private readonly svc: TodoListService) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.load();
   }
 
-  load(): void {
+  public load(): void {
     this.loading = true;
     this.error = '';
     this.svc.getAll().subscribe({
@@ -40,7 +40,7 @@ export class TodoListComponent implements OnInit {
     });
   }
 
-  add(): void {
+  public add(): void {
     const title = this.newTitle?.trim();
     if (!title) return;
     this.loading = true;
@@ -58,12 +58,12 @@ export class TodoListComponent implements OnInit {
     });
   }
 
-  startEdit(todo: Todo): void {
+  public startEdit(todo: Todo): void {
     this.editingId = todo.id ?? null;
     this.editTitle = todo.title;
   }
 
-  saveEdit(todo: Todo): void {
+  public saveEdit(todo: Todo): void {
     const title = this.editTitle?.trim();
     if (!this.editingId || !title) return;
 
@@ -86,12 +86,12 @@ export class TodoListComponent implements OnInit {
     });
   }
 
-  cancelEdit(): void {
+  public cancelEdit(): void {
     this.editingId = null;
     this.editTitle = '';
   }
 
-  toggleDone(todo: Todo): void {
+  public toggleDone(todo: Todo): void {
     if (!todo.id) return;
 
     this.loading = true;
@@ -112,7 +112,7 @@ export class TodoListComponent implements OnInit {
     });
   }
 
-  delete(todo: Todo): void {
+  public delete(todo: Todo): void {
     if (!todo.id) return;
     this.loading = true;
     this.error = '';

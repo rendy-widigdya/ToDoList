@@ -6,23 +6,23 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class TodoListService {
-  private base = environment.apiBaseUrl;
+  private readonly base = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
-  getAll(): Observable<Todo[]> {
+  public getAll(): Observable<Todo[]> {
     return this.http.get<Todo[]>(this.base);
   }
 
-  create(title: string): Observable<Todo> {
+  public create(title: string): Observable<Todo> {
     return this.http.post<Todo>(this.base, { title });
   }
 
-  update(id: string, todo: Todo): Observable<void> {
+  public update(id: string, todo: Todo): Observable<void> {
     return this.http.put<void>(`${this.base}/${id}`, todo);
   }
 
-  delete(id: string): Observable<void> {
+  public delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
 }
